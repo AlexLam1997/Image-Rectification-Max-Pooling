@@ -21,7 +21,14 @@ unsigned char rectify(unsigned char input_value) {
 	}
 	return input_value;
 }
+__device__ unsigned char rectify_GPU(unsigned char input_value) {
+	if (input_value < 127)
+	{
+		return 127;
+	}
+	return input_value;
 
+}
 void process(char* input_filename, char* output_filename)
 {
 	unsigned error;
@@ -52,37 +59,7 @@ void process(char* input_filename, char* output_filename)
 	free(new_image);
 }
 
-
-void pre_thread_process(char* input_filename, char* output_filename, int number_threads) {
-	unsigned error;
-	char* input_filename, char* output_filename;
-
-	unsigned char* image, * new_image, * cuda_image, * cuda_new_image;
-	unsigned width, height;
-
-	error = lodepng_decode32_file(&image, &width, &height, input_filename);
-	if (error) printf("error %u: %s\n", error, lodepng_error_text(error));
-	new_image = (unsigned char*)malloc(width * height * 4 * sizeof(unsigned char));
-
-	cudaMalloc(cuda_image, width * height * 4 * sizeof(unsigned char));
-	cudaMemcpy(cuda_image, image, width * height * 4 * sizeof(unsigned char), cudaMemcpyHostToDevice);
-	cudaMalloc(cuda_new_image, width * height * 4 * sizeof(unsigned char));
-
-	threadProcess << < 1, number_threads >> > (height, width, number_threads, cuda_new_image, cuda_image);
-
-	cudaMemcpy(new_image, cuda_new_image, width * height * 4 * sizeof(unsigned char), cudaMemcpyDeviceToHost);//not sure if this is necesary or right???
-
-	lodepng_encode32_file(output_filename, new_image, width, height); //make the new image from the data 
-
-	free(image);
-	free(new_image);
-	cudaFree(cuda_image);
-	cudaFree(cuda_new_image);
-
-}
-
-
-__global__ threadProcess(int height, int width, int num_threads, unsigned char* new_image, unsigned char* image) {
+__global__ void threadProcess(int height, int width, int num_threads, unsigned char* new_image, unsigned char* image) {
 	// process image
 
 	int start;
@@ -97,15 +74,46 @@ __global__ threadProcess(int height, int width, int num_threads, unsigned char* 
 
 		//value = image[4 * width * i + 4 * j];
 
-		new_image[4 * i + 0] = rectify(image[4 * i + 0]); // R
-		new_image[4 * i + 1] = rectify(image[4 * i + 1]); // G
-		new_image[4 * i + 2] = rectify(image[4 * i + 2]); // B
+		new_image[4 * i + 0] = rectify_GPU(image[4 * i + 0]); // R
+		new_image[4 * i + 1] = rectify_GPU(image[4 * i + 1]); // G
+		new_image[4 * i + 2] = rectify_GPU(image[4 * i + 2]); // B
 		new_image[4 * i + 3] = image[4 * i + 3]; // A
 
 	}
 
 
 }
+
+void pre_thread_process(char* input_filename, char* output_filename, int number_threads) {
+	unsigned error;
+	//char* input_filename, char* output_filename;
+
+	unsigned char* image, * new_image, * cuda_image, * cuda_new_image;
+	unsigned width, height;
+
+	error = lodepng_decode32_file(&image, &width, &height, input_filename);
+	if (error) printf("error %u: %s\n", error, lodepng_error_text(error));
+	new_image = (unsigned char*)malloc(width * height * 4 * sizeof(unsigned char));
+
+	cudaMalloc((void**)&cuda_image,  width * height * 4 * sizeof(unsigned char));
+	cudaMemcpy(cuda_image, image, width * height * 4 * sizeof(unsigned char), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&cuda_new_image, width * height * 4 * sizeof(unsigned char));
+
+	threadProcess<<< 1, number_threads >> > (height, width, number_threads, cuda_new_image, cuda_image);
+
+	cudaMemcpy(new_image, cuda_new_image, width * height * 4 * sizeof(unsigned char), cudaMemcpyDeviceToHost);//not sure if this is necesary or right???
+
+	lodepng_encode32_file(output_filename, new_image, width, height); //make the new image from the data 
+
+	free(image);
+	free(new_image);
+	cudaFree(cuda_image);
+	cudaFree(cuda_new_image);
+
+}
+
+
+
 
 
 int main()
@@ -167,7 +175,7 @@ cudaError_t addWithCuda(int* c, const int* a, const int* b, unsigned int size)
 	}
 
 	// Launch a kernel on the GPU with one thread for each element.
-	addKernel << <1, size >> > (dev_c, dev_a, dev_b);
+	addKernel <<<1, size >> > (dev_c, dev_a, dev_b);
 
 	// Check for any errors launching the kernel
 	cudaStatus = cudaGetLastError();
