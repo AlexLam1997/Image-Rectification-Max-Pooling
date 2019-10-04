@@ -81,6 +81,7 @@
     <CudaCompile Include="lodepng.cu" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="goji.png" />
     <Image Include="inputFILE.png" />
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include<stdlib.h>
 #include "lodepng.h"
+#include<time.h>
+
 
 unsigned char rectify(unsigned char input_value) {
 	if (input_value < 127)
@@ -105,10 +107,22 @@ void pre_thread_process(char* input_filename, char* output_filename, int number_
 int main()
 {
 	///char* input_filename = "C:\Users\jmccon4\source\repos\lab1\lab1\inputFILE.png";
-	char* input_filename = "\inputFILE.png";
+	char* input_filename = "\goji.png";
 	char* output_filename = "Output.png";
+	//double time_spent = 0.0;
+	int thread_nums[9] = { 1, 2, 4, 8, 16, 32, 64, 128, 256 };
 
-	pre_thread_process(input_filename, output_filename, 256);
+	int i;
+	for (i = 0; i<9; i++) {
+		int number_of_threads = thread_nums[i];
+		//int number_of_threads = 256;
+		double time_spent = 0.0;
+		clock_t begin = clock();
 
+		pre_thread_process(input_filename, output_filename, number_of_threads);
+		clock_t end = clock();
+		time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+		printf("Number of threads: %d    Run time %f   \n", number_of_threads, time_spent);
+	}
 	return 0;
 }
