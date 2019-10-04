@@ -14,7 +14,7 @@ __global__ void process(char* input_filename, char* output_filename, unsigned wi
 
     for (int i = 0; i < height / 2; i += 2) {
         for (int j = 0; j < width / 2; j += 2) {
-
+            
 
             //new_image[4 * width * i + 4 * j + 0] = value; // R
             //new_image[4 * width * i + 4 * j + 1] = value; // G
