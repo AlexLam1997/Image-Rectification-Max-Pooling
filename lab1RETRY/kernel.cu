@@ -51,8 +51,6 @@ void process(char* input_filename, char* output_filename)
 }
 
 __global__ void threadProcess(int height, int width, int num_threads, unsigned char* new_image, unsigned char* image, int num_blocks) {
-	// process image
-
 	int start;
 	int end;
 	int total_size = width * height;
@@ -61,24 +59,15 @@ __global__ void threadProcess(int height, int width, int num_threads, unsigned c
 	end = start + thread_size;
 
 	for (int i = start; i < end; i++) {
-
-
-		//value = image[4 * width * i + 4 * j];
-
 		new_image[4 * i + 0] = rectify_GPU(image[4 * i + 0]); // R
 		new_image[4 * i + 1] = rectify_GPU(image[4 * i + 1]); // G
 		new_image[4 * i + 2] = rectify_GPU(image[4 * i + 2]); // B
 		new_image[4 * i + 3] = image[4 * i + 3]; // A
-
 	}
-
-
 }
 
 void pre_thread_process(char* input_filename, char* output_filename, int number_threads) {
 	unsigned error;
-	//char* input_filename, char* output_filename;
-
 	unsigned char* image, * new_image, * cuda_image, * cuda_new_image;
 	unsigned width, height;
 
@@ -106,7 +95,6 @@ void pre_thread_process(char* input_filename, char* output_filename, int number_
 	free(new_image);
 	cudaFree(cuda_image);
 	cudaFree(cuda_new_image);
-
 }
 
 
@@ -114,12 +102,8 @@ int main(int argc, char* argv[])
 {
     char* input_filename = argv[1];
     char* output_filename = argv[2];
-    //double time_spent = 0.0;
     int thread_nums = atoi(argv[3]);
 
-	//char* input_filename = "\goji.png";
-	//char* output_filename = "Output.png";
-	////double time_spent = 0.0;
 	//int thread_nums[9] = { 1, 2, 4, 8, 16, 32, 64, 128, 256 };
 
 	int i;
