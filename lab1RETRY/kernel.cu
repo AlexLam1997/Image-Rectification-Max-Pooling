@@ -50,14 +50,14 @@ void process(char* input_filename, char* output_filename)
 	free(new_image);
 }
 
-__global__ void threadProcess(int height, int width, int num_threads, unsigned char* new_image, unsigned char* image) {
+__global__ void threadProcess(int height, int width, int num_threads, unsigned char* new_image, unsigned char* image, int num_blocks) {
 	// process image
 
 	int start;
 	int end;
 	int total_size = width * height;
-	int thread_size = total_size / num_threads;
-	start = thread_size * threadIdx.x;
+	int thread_size = total_size / (num_threads* num_blocks);
+	start = thread_size * (blockIdx.x * blockDim.x + threadIdx.x );
 	end = start + thread_size;
 
 	for (int i = start; i < end; i++) {
@@ -89,8 +89,14 @@ void pre_thread_process(char* input_filename, char* output_filename, int number_
 	cudaMalloc((void**)&cuda_image,  width * height * 4 * sizeof(unsigned char));
 	cudaMemcpy(cuda_image, image, width * height * 4 * sizeof(unsigned char), cudaMemcpyHostToDevice);
 	cudaMalloc((void**)&cuda_new_image, width * height * 4 * sizeof(unsigned char));
+    
+    int block_number = number_threads / 1024 + 1;
+    int threads_per_block = number_threads / block_number;
 
-	threadProcess<<< 1, number_threads >> > (height, width, number_threads, cuda_new_image, cuda_image);
+    double time_spent = 0.0;
+    clock_t begin = clock();
+
+	threadProcess<<< block_number, threads_per_block >>> (height, width, threads_per_block, cuda_new_image, cuda_image, block_number);
 
 	cudaMemcpy(new_image, cuda_new_image, width * height * 4 * sizeof(unsigned char), cudaMemcpyDeviceToHost);//not sure if this is necesary or right???
 

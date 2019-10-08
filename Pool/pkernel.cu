@@ -26,25 +26,25 @@ __global__ void process(unsigned char* input_image, unsigned char* output_image,
 	// Number of pixels per thread
     // 994 x 998 = 992 012
 	int thread_size = total_size / num_threads;
-	int blocks_per_thread = thread_size / 4;
-    int blocks_per_row = width/2; 
+	int squares_per_thread = thread_size / 4;
+    int squares_per_row = width/2; 
 
-	start = blocks_per_thread * threadIdx.x;
-	end = start + blocks_per_thread;
+	start = squares_per_thread * (blockIdx.x * blockDim.x + threadIdx.x);
+	end = start + squares_per_thread;
 
-    if (num_threads > total_size / 4) {
-        blocks_per_thread = 1;
-    }
+    //if (num_threads > total_size / 4) {
+    //    squares_per_thread = 1;
+    //}
 	 
     // process image
-	// split image into N 2x2 blocks
-	// each thread processes N/numThreads blocks 
+	// split image into N 2x2 squares
+	// each thread processes N/numThreads squares 
 	// first square: tid * 8 (tid = 0) 
 	// below first: tid*8 + width * 8
     // i is block number
     for (int i = start; i< end; i++){
-        int row = 2*i/blocks_per_row;
-        unsigned char* one = input_image + i % blocks_per_row * 4 * 2 + row * width*4;
+        int row = 2*i/squares_per_row;
+        unsigned char* one = input_image + i % squares_per_row * 4 * 2 + row * width*4;
         unsigned char* two = one + 4;
         unsigned char* three = one+ width*4;
         unsigned char* four = two + width*4;
@@ -61,6 +61,7 @@ __global__ void process(unsigned char* input_image, unsigned char* output_image,
     }
 }
 
+#define THREADS_PER_BLOCK 1024
 int main(int argc, char* argv[])
 {
     char* input_filename = argv[1];
@@ -76,7 +77,7 @@ int main(int argc, char* argv[])
     error = lodepng_decode32_file(&image, &width, &height, input_filename);
     if (error) printf("error %u: %s\n", error, lodepng_error_text(error));
     
-    //  allocated memory in the device for the input image
+    // allocated memory in the device for the input image
     // we dont need it again the the host so just do cudaMalloc
     size_t imageSize = (size_t) width * height * 4 * sizeof(unsigned char);
     cudaMalloc((void** ) & d_image, imageSize);
@@ -84,13 +85,13 @@ int main(int argc, char* argv[])
     // allocate shared memory for the new image because we want it in host
     cudaMallocManaged(&new_image, imageSize/4);
 
+    
+    int block_number = thread_nums/1024+1;
+    int threads_per_block = thread_nums/block_number;
+    
     double time_spent = 0.0;
     clock_t begin = clock();
-
-    process << <1, thread_nums >> > (d_image, new_image, width, height, thread_nums);
-
-    //process<<<1, thread_nums >>>(d_image, new_image, width, height, thread_nums);
-    //process(d_image, new_image, width, height, num_threads);
+    process << <block_number, threads_per_block>> > (d_image, new_image, width, height, thread_nums);
 
     cudaDeviceSynchronize();
 
