@@ -52,7 +52,7 @@ __global__ void process(unsigned char* input_image, unsigned char* output_image,
 
 int main(int argc, char* argv[])
 {
-	char* input_filename = "input800x923.png";//argv[1];
+	char* input_filename = "./test.png";//argv[1];
 	char* output_filename = "output.png";//argv[2];
 	int num_threads = 10;//atoi(argv[3]);
 
