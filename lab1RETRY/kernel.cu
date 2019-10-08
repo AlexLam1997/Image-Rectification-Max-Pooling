@@ -104,18 +104,23 @@ void pre_thread_process(char* input_filename, char* output_filename, int number_
 }
 
 
-int main()
+int main(int argc, char* argv[])
 {
-	///char* input_filename = "C:\Users\jmccon4\source\repos\lab1\lab1\inputFILE.png";
-	char* input_filename = "\goji.png";
-	char* output_filename = "Output.png";
-	//double time_spent = 0.0;
-	int thread_nums[9] = { 1, 2, 4, 8, 16, 32, 64, 128, 256 };
+    char* input_filename = argv[1];
+    char* output_filename = argv[2];
+    //double time_spent = 0.0;
+    int thread_nums = atoi(argv[3]);
+
+	//char* input_filename = "\goji.png";
+	//char* output_filename = "Output.png";
+	////double time_spent = 0.0;
+	//int thread_nums[9] = { 1, 2, 4, 8, 16, 32, 64, 128, 256 };
 
 	int i;
-	for (i = 0; i<9; i++) {
-		int number_of_threads = thread_nums[i];
-		//int number_of_threads = 256;
+	//for (i = 0; i<9; i++) {
+		//int number_of_threads = thread_nums[i];
+        
+		int number_of_threads = thread_nums;
 		double time_spent = 0.0;
 		clock_t begin = clock();
 
@@ -123,6 +128,6 @@ int main()
 		clock_t end = clock();
 		time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
 		printf("Number of threads: %d    Run time %f   \n", number_of_threads, time_spent);
-	}
+	//}
 	return 0;
 }

@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include ".\lodepng.h"
 #include <algorithm> 
+#include<time.h>
+
 
 using namespace std;
 
@@ -25,41 +27,46 @@ __global__ void process(unsigned char* input_image, unsigned char* output_image,
     // 994 x 998 = 992 012
 	int thread_size = total_size / num_threads;
 	int blocks_per_thread = thread_size / 4;
+    int blocks_per_row = width/2; 
+
 	start = blocks_per_thread * threadIdx.x;
 	end = start + blocks_per_thread;
+
+    if (num_threads > total_size / 4) {
+        blocks_per_thread = 1;
+    }
 	 
     // process image
 	// split image into N 2x2 blocks
 	// each thread processes N/numThreads blocks 
 	// first square: tid * 8 (tid = 0) 
 	// below first: tid*8 + width * 8
+    // i is block number
     for (int i = start; i< end; i++){
-		unsigned char* one = input_image + 4 * i;
-		unsigned char* two = input_image+ 4 * i + 4;
-		unsigned char* three = input_image + 4 * i + 4 * width;
-		unsigned char* four = input_image + 4 * i + 4 * width + 4;
+        int row = 2*i/blocks_per_row;
+        unsigned char* one = input_image + i % blocks_per_row * 4 * 2 + row * width*4;
+        unsigned char* two = one + 4;
+        unsigned char* three = one+ width*4;
+        unsigned char* four = two + width*4;
 
 		int maxR = max( *one, *two, *three, *four );
 		int maxG = max( *(one+1), *(two+1), *(three+1), *(four+1));
 		int maxB = max( *(one + 2), *(two + 2), *(three + 2), *(four + 2) );
 		int maxA = max( *(one + 3), *(two + 3), *(three + 3), *(four + 3) );
 
-		//output_image[4 * i] = maxR;
-		//output_image[4 * i + 1] = maxG;
-		//output_image[4 * i + 2] = maxB;
-		//output_image[4 * i + 3] = maxA;
-        output_image[4 * i] = *one;
-        output_image[4 * i + 1] =*two;
-        output_image[4 * i + 2] =*three;
-        output_image[4 * i + 3] =*four;
+		output_image[4 * i] = maxR;
+		output_image[4 * i + 1] = maxG;
+		output_image[4 * i + 2] = maxB;
+		output_image[4 * i + 3] = maxA;
     }
 }
 
 int main(int argc, char* argv[])
 {
-	char* input_filename = "./test.png";//argv[1];
-	char* output_filename = "./output.png";//argv[2];
-	int num_threads = 256;//atoi(argv[3]);
+    char* input_filename = argv[1];
+    char* output_filename = argv[2];
+    //double time_spent = 0.0;
+    int thread_nums = atoi(argv[3]);
 
     unsigned error;
     unsigned char* image, * new_image;
@@ -77,11 +84,21 @@ int main(int argc, char* argv[])
     // allocate shared memory for the new image because we want it in host
     cudaMallocManaged(&new_image, imageSize/4);
 
-    process<<<1, num_threads>>>(d_image, new_image, width, height, num_threads);
+    double time_spent = 0.0;
+    clock_t begin = clock();
+
+    process << <1, thread_nums >> > (d_image, new_image, width, height, thread_nums);
+
+    //process<<<1, thread_nums >>>(d_image, new_image, width, height, thread_nums);
+    //process(d_image, new_image, width, height, num_threads);
 
     cudaDeviceSynchronize();
 
     lodepng_encode32_file(output_filename, new_image, width/2, height/2);
+
+    clock_t end = clock();
+    time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("Number of threads: %d    Run time %f   \n", thread_nums, time_spent);
 
     cudaFree(d_image); cudaFree(new_image);
     return 0;
