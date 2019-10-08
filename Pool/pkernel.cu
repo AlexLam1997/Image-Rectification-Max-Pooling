@@ -22,6 +22,7 @@ __global__ void process(unsigned char* input_image, unsigned char* output_image,
 	// Number of pixels to process
 	int total_size = width * height;
 	// Number of pixels per thread
+    // 994 x 998 = 992 012
 	int thread_size = total_size / num_threads;
 	int blocks_per_thread = thread_size / 4;
 	start = blocks_per_thread * threadIdx.x;
@@ -43,18 +44,22 @@ __global__ void process(unsigned char* input_image, unsigned char* output_image,
 		int maxB = max( *(one + 2), *(two + 2), *(three + 2), *(four + 2) );
 		int maxA = max( *(one + 3), *(two + 3), *(three + 3), *(four + 3) );
 
-		output_image[4 * i] = maxR;
-		output_image[4 * i + 1] = maxG;
-		output_image[4 * i + 2] = maxB;
-		output_image[4 * i + 3] = maxA;
+		//output_image[4 * i] = maxR;
+		//output_image[4 * i + 1] = maxG;
+		//output_image[4 * i + 2] = maxB;
+		//output_image[4 * i + 3] = maxA;
+        output_image[4 * i] = *one;
+        output_image[4 * i + 1] =*two;
+        output_image[4 * i + 2] =*three;
+        output_image[4 * i + 3] =*four;
     }
 }
 
 int main(int argc, char* argv[])
 {
 	char* input_filename = "./test.png";//argv[1];
-	char* output_filename = "output.png";//argv[2];
-	int num_threads = 10;//atoi(argv[3]);
+	char* output_filename = "./output.png";//argv[2];
+	int num_threads = 256;//atoi(argv[3]);
 
     unsigned error;
     unsigned char* image, * new_image;
@@ -76,7 +81,7 @@ int main(int argc, char* argv[])
 
     cudaDeviceSynchronize();
 
-    lodepng_encode32_file(output_filename, new_image, width, height);
+    lodepng_encode32_file(output_filename, new_image, width/2, height/2);
 
     cudaFree(d_image); cudaFree(new_image);
     return 0;
