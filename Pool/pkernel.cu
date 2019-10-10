@@ -5,9 +5,8 @@
 #include ".\lodepng.h"
 #include <algorithm> 
 #include<time.h>
-
-
 using namespace std;
+
 
 __device__ int max(int a, int b, int c, int d) {
 	int max = a;
@@ -17,24 +16,21 @@ __device__ int max(int a, int b, int c, int d) {
 	return max;
 }
 
-__global__ void process(unsigned char* input_image, unsigned char* output_image, unsigned width, unsigned height, int num_threads, int num_blocks)
+__global__ void gpu_process(unsigned char* input_image, unsigned char* output_image, unsigned width, unsigned height, int num_threads, int num_blocks)
 {
 	int start;
 	int end;
+
 	// Number of pixels to process
 	int total_size = width * height;
+
 	// Number of pixels per thread
-    // 994 x 998 = 992 012
 	int thread_size = total_size / (num_threads* num_blocks);
 	int squares_per_thread = thread_size / 4;
     int squares_per_row = width/2; 
 
 	start = squares_per_thread * (blockIdx.x * blockDim.x + threadIdx.x);
 	end = start + squares_per_thread;
-
-    //if (num_threads > total_size / 4) {
-    //    squares_per_thread = 1;
-    //}
 	 
     // process image
 	// split image into N 2x2 squares
@@ -61,42 +57,69 @@ __global__ void process(unsigned char* input_image, unsigned char* output_image,
     }
 }
 
+double run_process(int num_threads, int width, int height, unsigned char* new_image, char* output_filename, unsigned char* d_image) {
+	int block_number = num_threads / 1024 + 1;
+	int threads_per_block = num_threads / block_number;
+
+	double time_spent = 0.0;
+	clock_t begin = clock();
+	gpu_process <<<block_number, threads_per_block >>> (d_image, new_image, width, height, threads_per_block, block_number);
+	cudaDeviceSynchronize();
+	lodepng_encode32_file(output_filename, new_image, width / 2, height / 2);
+	clock_t end = clock();
+
+	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+	return time_spent;
+}
+
+void pre_process(char* input_filename, unsigned char** d_image, unsigned char** new_image, unsigned* width, unsigned* height) {
+	unsigned error;
+	unsigned char* image;
+
+	error = lodepng_decode32_file(&image, width, height, input_filename);
+	if (error) printf("error %u: %s\n", error, lodepng_error_text(error));
+
+	// allocated memory in the device for the input image
+	// we dont need it again the the host so just do cudaMalloc
+	size_t imageSize = (size_t)((*width) * (*height) * 4 * sizeof(unsigned char));
+	cudaMalloc((void**) & *d_image, imageSize);
+	cudaMemcpy(*d_image, image, imageSize, cudaMemcpyHostToDevice);
+	// allocate shared memory for the new image because we want it in host
+	cudaMallocManaged(new_image, imageSize / 4);
+}
+
 int main(int argc, char* argv[])
 {
+	bool use_cli = false; 
     char* input_filename = argv[1];
     char* output_filename = argv[2];
-    int thread_nums = atoi(argv[3]);
 
-    unsigned error;
-    unsigned char* image, * new_image;
-    unsigned char* d_image; 
-    unsigned width, height;
+	unsigned char * new_image;
+	unsigned char* d_image;
+	unsigned width, height;
 
-    error = lodepng_decode32_file(&image, &width, &height, input_filename);
-    if (error) printf("error %u: %s\n", error, lodepng_error_text(error));
-    
-    // allocated memory in the device for the input image
-    // we dont need it again the the host so just do cudaMalloc
-    size_t imageSize = (size_t) width * height * 4 * sizeof(unsigned char);
-    cudaMalloc((void** ) & d_image, imageSize);
-    cudaMemcpy(d_image, image, imageSize, cudaMemcpyHostToDevice);
-    // allocate shared memory for the new image because we want it in host
-    cudaMallocManaged(&new_image, imageSize/4);
-    
-    int block_number = thread_nums/1024+1;
-    int threads_per_block = thread_nums/block_number;
-    
-    double time_spent = 0.0;
-    clock_t begin = clock();
-    process <<<block_number, threads_per_block>>> (d_image, new_image, width, height, threads_per_block, block_number);
+	pre_process(input_filename, &d_image, &new_image, &width, &height);
 
-    cudaDeviceSynchronize();
-
-    lodepng_encode32_file(output_filename, new_image, width/2, height/2);
-
-    clock_t end = clock();
-    time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("Number of threads: %d    Run time %f   \n", thread_nums, time_spent);
+	if (use_cli) {
+		// use number of threads provided by command line, use this for demos
+		int number_of_threads = atoi(argv[3]);
+		double duration = run_process(number_of_threads, width, height, new_image, output_filename, d_image);
+		printf("Number of threads: %d    Run time %f   \n", number_of_threads, duration);
+	}
+	else {
+		// disreguard command line thread numbers and use preset number of threads, use this for timing information gathering
+		int max_thread_power = 11;
+		int average_count = 100;
+		double average_time = 0;
+		for (int i = 0; i <= max_thread_power; i++) {
+			int number_of_threads = pow(2, i);
+			for (int j = 0; j < average_count; j++) {
+				double duration = run_process(number_of_threads, width, height, new_image, output_filename, d_image);
+				average_time += duration/average_count;
+			}
+			printf("Average runtime for %d threads and %d runs is:     %f seconds.\n", number_of_threads, average_count, average_time);
+		}
+	}
 
     cudaFree(d_image); cudaFree(new_image);
     return 0;
