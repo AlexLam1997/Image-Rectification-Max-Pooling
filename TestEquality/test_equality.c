@@ -37,16 +37,27 @@ float get_MSE(char* input_filename_1, char* input_filename_2)
 
 int main(int argc, char *argv[])
 {
-  char* input_filename_1 = argv[1];
-  char* input_filename_2 = argv[2];
+  char* input_filename_1 = "pooling_output.png";
+  char* input_filename_2 = "test_pooling.png";
+  char* input_filename_3 = "rectify_output.png";
+  char* input_filename_4 = "test_rectify.png";
 
   // get mean squared error between image1 and image2
-  float MSE = get_MSE(input_filename_1, input_filename_2);
+  float MSE_pool = get_MSE(input_filename_1, input_filename_2);
+  float MSE_rect = get_MSE(input_filename_3, input_filename_4);
 
-  if (MSE < MAX_MSE) {
-    printf("Images are equal (MSE = %f, MAX_MSE = %f)\n",MSE,MAX_MSE);
+
+  if (MSE_pool < MAX_MSE) {
+    printf("Pooling: Images are equal (MSE = %f, MAX_MSE = %f)\n",MSE_pool,MAX_MSE);
   } else {
-    printf("Images are NOT equal (MSE = %f, MAX_MSE = %f)\n",MSE,MAX_MSE);
+    printf("Pooling: Images are NOT equal (MSE = %f, MAX_MSE = %f)\n",MSE_pool,MAX_MSE);
+  }
+
+  if (MSE_rect < MAX_MSE) {
+	  printf("Pooling: Images are equal (MSE = %f, MAX_MSE = %f)\n", MSE_rect, MAX_MSE);
+  }
+  else {
+	  printf("Pooling: Images are NOT equal (MSE = %f, MAX_MSE = %f)\n", MSE_rect, MAX_MSE);
   }
 
   return 0;

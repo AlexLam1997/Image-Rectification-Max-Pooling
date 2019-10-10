@@ -6,6 +6,7 @@
 #include<stdlib.h>
 #include "lodepng.h"
 #include<time.h>
+#include <math.h> 
 
 
 unsigned char rectify(unsigned char input_value) {
@@ -15,6 +16,7 @@ unsigned char rectify(unsigned char input_value) {
 	}
 	return input_value;
 }
+
 __device__ unsigned char rectify_GPU(unsigned char input_value) {
 	if (input_value < 127)
 	{
@@ -104,13 +106,11 @@ int main(int argc, char* argv[])
     char* output_filename = argv[2];
     int thread_nums = atoi(argv[3]);
 
-	//int thread_nums[9] = { 1, 2, 4, 8, 16, 32, 64, 128, 256 };
-
 	int i;
-	//for (i = 0; i<9; i++) {
-		//int number_of_threads = thread_nums[i];
+	for (i = 0; i<=11; i++) {
+		int number_of_threads = pow(2,i);
         
-		int number_of_threads = thread_nums;
+		//int number_of_threads = thread_nums;
 		double time_spent = 0.0;
 		clock_t begin = clock();
 
@@ -118,6 +118,6 @@ int main(int argc, char* argv[])
 		clock_t end = clock();
 		time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
 		printf("Number of threads: %d    Run time %f   \n", number_of_threads, time_spent);
-	//}
+	}
 	return 0;
 }
