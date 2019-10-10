@@ -90,6 +90,7 @@ void pre_process(char* input_filename, unsigned char** d_image, unsigned char** 
 
 int main(int argc, char* argv[])
 {
+	// true for demo, false for 
 	bool use_cli = false; 
     char* input_filename = argv[1];
     char* output_filename = argv[2];
@@ -110,14 +111,11 @@ int main(int argc, char* argv[])
 		// disreguard command line thread numbers and use preset number of threads, use this for timing information gathering
 		int max_thread_power = 11;
 		int average_count = 100;
-		double average_time = 0;
+
 		for (int i = 0; i <= max_thread_power; i++) {
 			int number_of_threads = pow(2, i);
-			for (int j = 0; j < average_count; j++) {
-				double duration = run_process(number_of_threads, width, height, new_image, output_filename, d_image);
-				average_time += duration/average_count;
-			}
-			printf("Average runtime for %d threads and %d runs is:     %f seconds.\n", number_of_threads, average_count, average_time);
+			double duration = run_process(number_of_threads, width, height, new_image, output_filename, d_image);
+			printf("Number of threads: %d    Run time %f   \n", number_of_threads, duration);
 		}
 	}
 
