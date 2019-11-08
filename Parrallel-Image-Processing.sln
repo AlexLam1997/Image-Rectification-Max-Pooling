@@ -1,0 +1,95 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Rectification", "ImageRectification\ImageRectification.vcxproj", "{EFB248F0-A8E3-4075-B977-E3BE628CD95D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MaxPooling", "ImageMaxPooling\Pool.vcxproj", "{3065D025-E130-4FAA-B644-A6633B205BE2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EA4DD07E-C325-43AC-85A4-29D18442EB19}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestEquality", "TestEquality\TestEquality.vcxproj", "{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		custom|Any CPU = custom|Any CPU
+		custom|x64 = custom|x64
+		custom|x86 = custom|x86
+		custompool|Any CPU = custompool|Any CPU
+		custompool|x64 = custompool|x64
+		custompool|x86 = custompool|x86
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.custom|Any CPU.ActiveCfg = custom|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.custom|x64.ActiveCfg = custom|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.custom|x64.Build.0 = custom|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.custom|x86.ActiveCfg = custom|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.custompool|Any CPU.ActiveCfg = custom|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.custompool|Any CPU.Build.0 = custom|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.custompool|x64.ActiveCfg = Debug|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.custompool|x64.Build.0 = Debug|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.custompool|x86.ActiveCfg = custom|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.custompool|x86.Build.0 = custom|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.Debug|x64.ActiveCfg = Debug|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.Debug|x64.Build.0 = Debug|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.Debug|x86.ActiveCfg = Debug|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.Release|Any CPU.ActiveCfg = Release|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.Release|x64.ActiveCfg = Release|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.Release|x64.Build.0 = Release|x64
+		{EFB248F0-A8E3-4075-B977-E3BE628CD95D}.Release|x86.ActiveCfg = Release|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.custom|Any CPU.ActiveCfg = custompool|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.custom|Any CPU.Build.0 = custompool|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.custom|x64.ActiveCfg = Release|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.custom|x64.Build.0 = Release|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.custom|x86.ActiveCfg = custompool|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.custom|x86.Build.0 = custompool|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.custompool|Any CPU.ActiveCfg = custompool|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.custompool|x64.ActiveCfg = Debug|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.custompool|x64.Build.0 = Debug|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.custompool|x86.ActiveCfg = custompool|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.Debug|x64.ActiveCfg = Debug|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.Debug|x64.Build.0 = Debug|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.Debug|x86.ActiveCfg = Debug|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.Release|Any CPU.ActiveCfg = Release|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.Release|x64.ActiveCfg = Release|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.Release|x64.Build.0 = Release|x64
+		{3065D025-E130-4FAA-B644-A6633B205BE2}.Release|x86.ActiveCfg = Release|x64
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.custom|Any CPU.ActiveCfg = Release|x64
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.custom|Any CPU.Build.0 = Release|x64
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.custom|x64.ActiveCfg = Release|x64
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.custom|x64.Build.0 = Release|x64
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.custom|x86.ActiveCfg = Release|Win32
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.custom|x86.Build.0 = Release|Win32
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.custompool|Any CPU.ActiveCfg = Release|x64
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.custompool|Any CPU.Build.0 = Release|x64
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.custompool|x64.ActiveCfg = Release|x64
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.custompool|x64.Build.0 = Release|x64
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.custompool|x86.ActiveCfg = Release|Win32
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.custompool|x86.Build.0 = Release|Win32
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.Debug|x64.ActiveCfg = Debug|x64
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.Debug|x64.Build.0 = Debug|x64
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.Debug|x86.ActiveCfg = Debug|Win32
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.Debug|x86.Build.0 = Debug|Win32
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.Release|Any CPU.ActiveCfg = Release|Win32
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.Release|x64.ActiveCfg = Release|x64
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.Release|x64.Build.0 = Release|x64
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.Release|x86.ActiveCfg = Release|Win32
+		{BC88B807-3BC5-4FDF-A1EA-B81424C1B73C}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {474C8C1F-FC7A-4CA1-9FD0-F3C6653166B2}
+	EndGlobalSection
+EndGlobal
